@@ -2,19 +2,28 @@ const express = require('express');
 const router = express.Router();
 const Formation = require('../models/Formation');
 
-
-router.post('/', async (req, res) => {
-    const { title, description, category } = req.body;
+// Route POST pour ajouter une formation
+router.post('/formations', async (req, res) => {
+    const { dateCreation, nomFormation, thematiqueFormation, nbMaxUtilisations, prixFormation, dateAjout } = req.body;
+    
     try {
-        const newFormation = new Formation({ title, description, category });
-        await newFormation.save();
-        res.status(201).json(newFormation);
+      const newFormation = new Formation({
+        dateCreation,
+        nomFormation,
+        thematiqueFormation,
+        nbMaxUtilisations,
+        prixFormation,
+        dateAjout,
+      });
+      await newFormation.save();
+      res.status(201).json(newFormation);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message });
     }
-});
+  });
+  
 
-// Récupérer toutes les formations
+// Autres routes pour récupérer et manipuler les formations
 router.get('/', async (req, res) => {
     try {
         const formations = await Formation.find();
@@ -24,7 +33,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Récupérer une formation par ID
 router.get('/:id', async (req, res) => {
     try {
         const formation = await Formation.findById(req.params.id);
@@ -35,7 +43,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Modifier une formation
 router.put('/:id', async (req, res) => {
     try {
         const updatedFormation = await Formation.findByIdAndUpdate(
@@ -49,7 +56,6 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Supprimer une formation
 router.delete('/:id', async (req, res) => {
     try {
         await Formation.findByIdAndDelete(req.params.id);
