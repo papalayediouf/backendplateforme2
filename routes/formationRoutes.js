@@ -48,16 +48,31 @@ router.get('/:id', async (req, res) => {
 // Modifier une formation
 router.put('/:id', async (req, res) => {
     try {
+        const { nomFormation, thematiqueFormation, nbMaxUtilisations, prixFormation } = req.body;
+
         const updatedFormation = await Formation.findByIdAndUpdate(
             req.params.id,
-            { ...req.body, dateModified: Date.now() },
-            { new: true }
+            { 
+                nomFormation,
+                thematiqueFormation,
+                nbMaxUtilisations,
+                prixFormation,
+                dateModified: new Date() // Mise à jour automatique de la date
+            },
+            { new: true } // Retourne la formation mise à jour
         );
-        res.json(updatedFormation);
+
+        if (!updatedFormation) {
+            return res.status(404).json({ message: 'Formation non trouvée' });
+        }
+
+        res.status(200).json(updatedFormation);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: 'Erreur lors de la mise à jour', error: err.message });
     }
 });
+
+
 
 // Supprimer une formation
 router.delete('/:id', async (req, res) => {
