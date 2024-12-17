@@ -8,6 +8,7 @@ const FormationSchema = new mongoose.Schema({
     prixFormation: { type: Number, required: true },
     dateAjout: { type: Date, required: true },
     dateModified: { type: Date, default: null },
+    image: { type: String, default: null }, 
 });
 
 module.exports = mongoose.model('Formation', FormationSchema);
