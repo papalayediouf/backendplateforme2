@@ -1,38 +1,12 @@
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const Formation = require('../models/Formation.js');
 const router = express.Router();
+const Formation = require('../models/Formation');
 
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); 
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); 
-  },
-});
-
-const upload = multer({ storage });
-
-router.post('/', upload.single('image'), async (req, res) => {
-    const { dateCreation, nomFormation, thematiqueFormation, nbMaxUtilisations, prixFormation, dateAjout } = req.body;
-
-    if (!dateCreation || !nomFormation || !thematiqueFormation || !nbMaxUtilisations || !prixFormation || !dateAjout) {
-        return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
-    }
-
+router.post('/', async (req, res) => {
+    const { title, description, category } = req.body;
     try {
-        const newFormation = new Formation({
-            dateCreation,
-            nomFormation,
-            thematiqueFormation,
-            nbMaxUtilisations,
-            prixFormation,
-            dateAjout,
-            image: req.file ? req.file.path : null, 
-        });
+        const newFormation = new Formation({ title, description, category });
         await newFormation.save();
         res.status(201).json(newFormation);
     } catch (err) {
@@ -40,7 +14,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     }
 });
 
-
+// Récupérer toutes les formations
 router.get('/', async (req, res) => {
     try {
         const formations = await Formation.find();
@@ -50,11 +24,11 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Route pour obtenir une formation par ID
+// Récupérer une formation par ID
 router.get('/:id', async (req, res) => {
     try {
         const formation = await Formation.findById(req.params.id);
-        if (!formation) return res.status(404).json({ message: 'Formation non trouvée' });
+        if (!formation) return res.status(404).json({ message: 'Formation not found' });
         res.json(formation);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -64,27 +38,14 @@ router.get('/:id', async (req, res) => {
 // Modifier une formation
 router.put('/:id', async (req, res) => {
     try {
-        const { nomFormation, thematiqueFormation, nbMaxUtilisations, prixFormation } = req.body;
-
         const updatedFormation = await Formation.findByIdAndUpdate(
             req.params.id,
-            { 
-                nomFormation,
-                thematiqueFormation,
-                nbMaxUtilisations,
-                prixFormation,
-                dateModified: new Date() 
-            },
-            { new: true } 
+            { ...req.body, dateModified: Date.now() },
+            { new: true }
         );
-
-        if (!updatedFormation) {
-            return res.status(404).json({ message: 'Formation non trouvée' });
-        }
-
-        res.status(200).json(updatedFormation);
+        res.json(updatedFormation);
     } catch (err) {
-        res.status(500).json({ message: 'Erreur lors de la mise à jour', error: err.message });
+        res.status(500).json({ message: err.message });
     }
 });
 
@@ -92,7 +53,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         await Formation.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Formation supprimée' });
+        res.json({ message: 'Formation deleted' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
