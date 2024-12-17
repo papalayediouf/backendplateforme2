@@ -10,4 +10,4 @@ const FormationSchema = new mongoose.Schema({
     dateModified: { type: Date, default: null },
 });
 
-module.exports = mongoose.model('Formation', FormationSchema);
+module.exports  = mongoose.model('Formation', FormationSchema);

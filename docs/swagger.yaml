@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: API de Formation
+  version: 1.0.0
+  description: Documentation de l'API pour la gestion des formations
+servers:
+  - url: http://localhost:5000
+paths:
+  /formations:
+    get:
+      summary: Récupérer toutes les formations
+      description: Retourne une liste de toutes les formations disponibles.
+      responses:
+        200:
+          description: Liste des formations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: ID unique de la formation
+                    nomFormation:
+                      type: string
+                      description: Nom de la formation
+                    thematiqueFormation:
+                      type: string
+                      description: Thématique de la formation
+                    prixFormation:
+                      type: number
+                      description: Prix de la formation
+                    nbMaxUtilisations:
+                      type: number
+                      description: Nombre maximal d'utilisations de la formation
+    post:
+      summary: Ajouter une nouvelle formation
+      description: Permet d'ajouter une nouvelle formation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nomFormation:
+                  type: string
+                  description: Nom de la formation
+                thematiqueFormation:
+                  type: string
+                  description: Thématique de la formation
+                prixFormation:
+                  type: number
+                  description: Prix de la formation
+                nbMaxUtilisations:
+                  type: number
+                  description: Nombre maximal d'utilisations
+      responses:
+        201:
+          description: Formation ajoutée avec succès
+        400:
+          description: Erreur de validation
+  /formations/{id}:
+    get:
+      summary: Récupérer une formation par ID
+      description: Retourne les détails d'une formation spécifique.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la formation
+          schema:
+            type: string
+      responses:
+        200:
+          description: Formation trouvée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  nomFormation:
+                    type: string
+                  thematiqueFormation:
+                    type: string
+                  prixFormation:
+                    type: number
+                  nbMaxUtilisations:
+                    type: number
+        404:
+          description: Formation non trouvée
+    put:
+      summary: Mettre à jour une formation existante
+      description: Permet de mettre à jour une formation en fonction de son ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la formation à mettre à jour
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nomFormation:
+                  type: string
+                thematiqueFormation:
+                  type: string
+                prixFormation:
+                  type: number
+                nbMaxUtilisations:
+                  type: number
+      responses:
+        200:
+          description: Formation mise à jour avec succès
+        400:
+          description: Erreur de validation
+        404:
+          description: Formation non trouvée
+    delete:
+      summary: Supprimer une formation
+      description: Permet de supprimer une formation en fonction de son ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la formation à supprimer
+          schema:
+            type: string
+      responses:
+        200:
+          description: Formation supprimée avec succès
+        404:
+          description: Formation non trouvée
