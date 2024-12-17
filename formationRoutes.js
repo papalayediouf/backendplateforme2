@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Formation = require('../models/Formation');
 
-// Ajouter une formation
+
 router.post('/', async (req, res) => {
     const { title, description, category } = req.body;
     try {

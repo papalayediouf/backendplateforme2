@@ -1,9 +1,23 @@
 const express = require('express');
-const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const Formation = require('../models/Formation.js');
+const router = express.Router();
 
-// Ajouter une formation
-router.post('/', async (req, res) => {
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); 
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); 
+  },
+});
+
+const upload = multer({ storage });
+
+// Route pour créer une formation avec une image
+router.post('/', upload.single('image'), async (req, res) => {
     const { dateCreation, nomFormation, thematiqueFormation, nbMaxUtilisations, prixFormation, dateAjout } = req.body;
 
     if (!dateCreation || !nomFormation || !thematiqueFormation || !nbMaxUtilisations || !prixFormation || !dateAjout) {
@@ -18,6 +32,7 @@ router.post('/', async (req, res) => {
             nbMaxUtilisations,
             prixFormation,
             dateAjout,
+            image: req.file ? req.file.path : null,
         });
         await newFormation.save();
         res.status(201).json(newFormation);
@@ -35,6 +50,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Route pour obtenir une formation par ID
 router.get('/:id', async (req, res) => {
     try {
         const formation = await Formation.findById(req.params.id);
@@ -57,9 +73,9 @@ router.put('/:id', async (req, res) => {
                 thematiqueFormation,
                 nbMaxUtilisations,
                 prixFormation,
-                dateModified: new Date() // Mise à jour automatique de la date
+                dateModified: new Date() 
             },
-            { new: true } // Retourne la formation mise à jour
+            { new: true } 
         );
 
         if (!updatedFormation) {
@@ -71,8 +87,6 @@ router.put('/:id', async (req, res) => {
         res.status(500).json({ message: 'Erreur lors de la mise à jour', error: err.message });
     }
 });
-
-
 
 // Supprimer une formation
 router.delete('/:id', async (req, res) => {
